@@ -108,13 +108,24 @@ model = ETSModel(
 )
 fit = model.fit()
 
-pred = fit.get_prediction(start=test_start, end="2016").summary_frame(alpha=0.05)
+pred = fit.get_prediction(start=0, end=len(data) - 1).summary_frame(alpha=0.05)
 
 df_plot = pd.concat([data.rename({"0": "actuals"}), pred], axis=1)
 
 fig, ax_eval = plt.subplots()
 
-sns.lineplot(data=df_plot, ax=ax_eval)
+# df_plot.loc[df_plot.index < test_start]["actuals"].plot(
+#     label="actuals", legend=True, ax=ax_eval, alpha=0.5
+# )
+df_plot["actuals"].plot(label="actuals", legend=True, ax=ax_eval, alpha=0.5)
+df_plot.loc[df_plot.index < test_start]["mean"].plot(
+    label="mean_in_sample", legend=True, ax=ax_eval
+)
+df_plot.loc[df_plot.index >= test_start]["mean"].plot(
+    label="mean_out_of_sample", legend=True, ax=ax_eval
+)
+
+# sns.lineplot(data=df_plot, ax=ax_eval)
 st.pyplot(fig)
 
 # st.subheader("Sunpsots")
