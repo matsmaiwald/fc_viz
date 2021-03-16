@@ -5,6 +5,8 @@ from statsmodels.tsa.exponential_smoothing.ets import ETSModel
 import seaborn as sns
 import matplotlib.pyplot as plt
 
+from sklearn.metrics import mean_squared_error
+
 
 st.title("Forecasting Australian Tourist Data")
 
@@ -110,6 +112,13 @@ fit = model.fit()
 
 pred = fit.get_prediction(start=0, end=len(data) - 1).summary_frame(alpha=0.05)
 
+mse_in_sample = mean_squared_error(
+    data.loc[data.index < test_start], pred.loc[pred.index < test_start]["mean"]
+)
+mse_out_of_sample = mean_squared_error(
+    data.loc[data.index >= test_start], pred.loc[pred.index >= test_start]["mean"]
+)
+
 df_plot = pd.concat([data.rename({"0": "actuals"}), pred], axis=1)
 
 fig, ax_eval = plt.subplots()
@@ -124,6 +133,9 @@ df_plot.loc[df_plot.index < test_start]["mean"].plot(
 df_plot.loc[df_plot.index >= test_start]["mean"].plot(
     label="mean_out_of_sample", legend=True, ax=ax_eval
 )
+
+st.text(f"In-sample RMSE: {mse_in_sample}")
+st.text(f"Out-of-sample RMSE: {mse_out_of_sample}")
 
 # sns.lineplot(data=df_plot, ax=ax_eval)
 st.pyplot(fig)
