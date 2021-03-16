@@ -99,13 +99,16 @@ st.title("ETS Model Parameters")
 test_start = st.selectbox("train_test_cutoff", ("2010", "2012", "2014"))
 seasonality_option = st.selectbox("seasonality", ("add", "mul"))
 trend_option = st.selectbox("trend", ("add", "mul"))
+damped_trend = st.selectbox("damped_trend", ("True", "False"))
+error_option = st.selectbox("error", ("add", "mul"))
+damped_trend_option = True if damped_trend == "True" else False
 
 model = ETSModel(
     data.loc[data.index < test_start],
-    error="add",
+    error=error_option,
     trend=trend_option,
     seasonal=seasonality_option,
-    damped_trend=True,
+    damped_trend=damped_trend_option,
     seasonal_periods=4,
 )
 fit = model.fit()
