@@ -26,17 +26,45 @@ st.pyplot(fig_data)
 
 st.title("ETS Model Parameters")
 
-test_start = st.selectbox("train_test_cutoff", ("2010", "2012", "2014"))
-seasonality_option = st.selectbox("seasonality", ("None", "add", "mul"))
-trend_option = st.selectbox("trend", ("None", "add", "mul"))
-damped_trend = st.selectbox("damped_trend", ("True", "False"))
-error_option = st.selectbox("error", ("add", "mul"))
+
+test_start = st.sidebar.selectbox("train_test_cutoff", ("2010", "2012", "2014"))
+seasonality_option = st.sidebar.selectbox("seasonality", ("None", "add", "mul"))
+trend_option = st.sidebar.selectbox("trend", ("None", "add"))
+damped_trend = st.sidebar.selectbox("damped_trend", ("True", "False"))
+error_option = st.sidebar.selectbox("error", ("add", "mul"))
 damped_trend_option = True if damped_trend == "True" else False
 
 if seasonality_option == "None":
     seasonality_option = None
 if trend_option == "None":
     trend_option = None
+
+
+def get_equation(trend_opt, seasonality_opt, damped_opt, error_opt) -> str:
+    add_block = "l_{t-1}"
+    mult_block = ""
+    error_block = r"+ \epsilon_t"
+    if error_option == "mul":
+        error_block = r"*(1+\epsilon_t)"
+    if trend_opt == "add":
+        add_block += "+ b_{t-1}"
+
+    if seasonality_opt == "add":
+        add_block += "+ s_{t-m}"
+    if seasonality_opt == "mul":
+        mult_block = "* s_{t-m}"
+    eqn = f"y_t = ({add_block}) {mult_block} {error_block}"
+    return eqn
+
+
+st.latex(
+    get_equation(
+        trend_opt=trend_option,
+        seasonality_opt=seasonality_option,
+        damped_opt=damped_trend,
+        error_opt=error_option,
+    )
+)
 
 model = ETSModel(
     data.loc[data.index < test_start],
