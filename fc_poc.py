@@ -24,7 +24,7 @@ fig_data, ax_data = plt.subplots()
 sns.lineplot(data=data_plot, x="x", y="# Tourists", ax=ax_data)
 st.pyplot(fig_data)
 
-st.title("ETS Model Parameters")
+st.title("ETS Model Equation")
 
 
 test_start = st.sidebar.selectbox("train_test_cutoff", ("2010", "2012", "2014"))
@@ -100,8 +100,9 @@ df_plot.loc[df_plot.index >= test_start]["mean"].plot(
     label="mean_out_of_sample", legend=True, ax=ax_eval
 )
 
-st.text(f"In-sample RMSE: {mse_in_sample}")
-st.text(f"Out-of-sample RMSE: {mse_out_of_sample}")
+st.title("Model Performance")
+st.text(f"In-sample RMSE: {round(mse_in_sample, 2)}")
+st.text(f"Out-of-sample RMSE: {round(mse_out_of_sample, 2)}")
 
 # sns.lineplot(data=df_plot, ax=ax_eval)
 st.pyplot(fig)
