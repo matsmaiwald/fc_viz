@@ -8,29 +8,25 @@ import matplotlib.pyplot as plt
 from sklearn.metrics import mean_squared_error
 from data import austourists_data
 
-st.title("Forecasting Australian Tourist Data")
 
+def get_australian_tourist_data():
+    t = pd.date_range("1999-03-01", "2015-12-01", freq="3MS")
+    data_plot = pd.DataFrame({"# Tourists": austourists_data, "x": t})
+    data = pd.Series(austourists_data, index=t)
+    data.name = "actuals"
+    return data, data_plot
 
-t = pd.date_range("1999-03-01", "2015-12-01", freq="3MS")
-data_plot = pd.DataFrame({"# Tourists": austourists_data, "x": t})
-data = pd.Series(austourists_data, index=t)
-data.name = "actuals"
-
-
-print(data)
-
-
-fig_data, ax_data = plt.subplots()
-sns.lineplot(data=data_plot, x="x", y="# Tourists", ax=ax_data)
-st.pyplot(fig_data)
 
 st.title("ETS Model Equation")
 
-
+dataset_option = st.sidebar.selectbox("dataset", ("australian_tourists", "test"))
 test_start = st.sidebar.selectbox("train_test_cutoff", ("2010", "2012", "2014"))
 seasonality_option = st.sidebar.selectbox("seasonality", ("None", "add", "mul"))
 trend_option = st.sidebar.selectbox("trend", ("None", "add"))
-damped_trend = st.sidebar.selectbox("damped_trend", ("True", "False"))
+if trend_option == "add":
+    damped_trend = st.sidebar.selectbox("damped_trend", ("False", "True"))
+else:
+    damped_trend = False
 error_option = st.sidebar.selectbox("error", ("add", "mul"))
 damped_trend_option = True if damped_trend == "True" else False
 
@@ -66,6 +62,8 @@ st.latex(
     )
 )
 
+if dataset_option == "australian_tourists":
+    data, data_plot = get_australian_tourist_data()
 model = ETSModel(
     data.loc[data.index < test_start],
     error=error_option,
