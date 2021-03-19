@@ -1,3 +1,5 @@
+import pandas as pd
+
 austourists_data = [
     30.05251300,
     19.14849600,
@@ -68,3 +70,16 @@ austourists_data = [
     61.09776802,
     66.05576122,
 ]
+
+
+def get_australian_tourist_data():
+    t = pd.date_range("1999-03-01", "2015-12-01", freq="3MS")
+    data_plot = pd.DataFrame({"# Tourists": austourists_data, "x": t})
+    data = pd.Series(austourists_data, index=t)
+    data.name = "actuals"
+    return data, data_plot
+
+
+def get_fred_data() -> pd.DataFrame:
+    data = pd.read_csv("SP500.csv", na_values=".")
+    return data.set_index("DATE")["SP500"]

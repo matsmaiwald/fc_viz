@@ -6,20 +6,12 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 
 from sklearn.metrics import mean_squared_error
-from data import austourists_data
-
-
-def get_australian_tourist_data():
-    t = pd.date_range("1999-03-01", "2015-12-01", freq="3MS")
-    data_plot = pd.DataFrame({"# Tourists": austourists_data, "x": t})
-    data = pd.Series(austourists_data, index=t)
-    data.name = "actuals"
-    return data, data_plot
+from data import get_australian_tourist_data
 
 
 st.title("ETS Model Equation")
 
-dataset_option = st.sidebar.selectbox("dataset", ("australian_tourists", "test"))
+dataset_option = st.sidebar.selectbox("dataset", ("australian_tourists", "S&P500"))
 test_start = st.sidebar.selectbox("train_test_cutoff", ("2010", "2012", "2014"))
 seasonality_option = st.sidebar.selectbox("seasonality", ("None", "add", "mul"))
 trend_option = st.sidebar.selectbox("trend", ("None", "add"))
