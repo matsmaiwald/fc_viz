@@ -1,4 +1,5 @@
 import pandas as pd
+from numpy import NaN
 
 austourists_data = [
     30.05251300,
@@ -81,5 +82,15 @@ def get_australian_tourist_data():
 
 
 def get_fred_data() -> pd.DataFrame:
-    data = pd.read_csv("SP500.csv", na_values=".")
-    return data.set_index("DATE")["SP500"]
+    data = pd.read_csv("SP500.csv", na_values=".", parse_dates=True)
+    data["DATE"] = pd.to_datetime(data["DATE"])
+    data = data.set_index("DATE")["SP500"]
+    data = data.reindex(
+        pd.bdate_range(min(data.index), max(data.index)), fill_value=NaN
+    )
+
+    return data.interpolate()
+
+
+if __name__ == "__main__":
+    get_fred_data()

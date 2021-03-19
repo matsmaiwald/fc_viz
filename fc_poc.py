@@ -6,13 +6,17 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 
 from sklearn.metrics import mean_squared_error
-from data import get_australian_tourist_data
+from data import get_australian_tourist_data, get_fred_data
+import datetime
 
 
 st.title("ETS Model Equation")
 
 dataset_option = st.sidebar.selectbox("dataset", ("australian_tourists", "S&P500"))
-test_start = st.sidebar.selectbox("train_test_cutoff", ("2010", "2012", "2014"))
+test_start = st.sidebar.selectbox(
+    "train_test_cutoff", ("2010", "2012", "2014", "2020-01-01", "2021-01-01")
+)
+# test_start = datetime.datetime.strptime(test_start, "%Y")
 seasonality_option = st.sidebar.selectbox("seasonality", ("None", "add", "mul"))
 trend_option = st.sidebar.selectbox("trend", ("None", "add"))
 if trend_option == "add":
@@ -54,39 +58,49 @@ st.latex(
     )
 )
 
-if dataset_option == "australian_tourists":
-    data, data_plot = get_australian_tourist_data()
+# if dataset_option == "australian_tourists":
+#     data, data_plot = get_australian_tourist_data()
+data = get_fred_data()
+data_train = data.loc[data.index < test_start]
+data_test = data.loc[data.index >= test_start]
 model = ETSModel(
-    data.loc[data.index < test_start],
+    data_train,
     error=error_option,
     trend=trend_option,
     seasonal=seasonality_option,
     damped_trend=damped_trend_option,
-    seasonal_periods=4,
+    seasonal_periods=5,
 )
 fit = model.fit()
 
-pred = fit.get_prediction(start=0, end=len(data) - 1).summary_frame(alpha=0.05)
+# pred = fit.get_prediction(start=test_start.date(), end=max(data.index)).summary_frame(
+#     alpha=0.05
+# )
+pred = fit.forecast(steps=(data_test.index.size))
 
-mse_in_sample = mean_squared_error(
-    data.loc[data.index < test_start], pred.loc[pred.index < test_start]["mean"]
-)
-mse_out_of_sample = mean_squared_error(
-    data.loc[data.index >= test_start], pred.loc[pred.index >= test_start]["mean"]
-)
+mse_in_sample = mean_squared_error(data_train, fit.fittedvalues)
+mse_out_of_sample = mean_squared_error(data_test, pred)
 
-df_plot = pd.concat([data.rename({"0": "actuals"}), pred], axis=1)
+df_plot = pd.concat(
+    [
+        data.rename("actuals"),
+        pred.rename("predictions"),
+        fit.fittedvalues.rename("fitted_values"),
+    ],
+    axis=1,
+)
 
 fig, ax_eval = plt.subplots()
 
 # df_plot.loc[df_plot.index < test_start]["actuals"].plot(
 #     label="actuals", legend=True, ax=ax_eval, alpha=0.5
 # )
+
 df_plot["actuals"].plot(label="actuals", legend=True, ax=ax_eval, alpha=0.5)
-df_plot.loc[df_plot.index < test_start]["mean"].plot(
+df_plot.loc[df_plot.index < test_start]["fitted_values"].plot(
     label="mean_in_sample", legend=True, ax=ax_eval
 )
-df_plot.loc[df_plot.index >= test_start]["mean"].plot(
+df_plot.loc[df_plot.index >= test_start]["predictions"].plot(
     label="mean_out_of_sample", legend=True, ax=ax_eval
 )
 
