@@ -53,15 +53,6 @@ model_option_parsed = parse_model_options_box(model_option_input)
 #     return eqn
 
 
-# st.latex(
-#     get_equation(
-#         trend_opt=trend_option,
-#         seasonality_opt=seasonality_option,
-#         damped_opt=damped_trend,
-#         error_opt=error_option,
-#     )
-# )
-
 # if dataset_option == "australian_tourists":
 #     data, data_plot = get_australian_tourist_data()
 # if dataset_option == "S&P500":
@@ -71,6 +62,7 @@ data_test = data.loc[data.index >= test_start]
 model = get_model(model_option_parsed, data_train)
 fit = model.fit()
 
+st.latex(model.equation)
 # pred = fit.get_prediction(start=test_start.date(), end=max(data.index)).summary_frame(
 #     alpha=0.05
 # )

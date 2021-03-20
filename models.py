@@ -21,7 +21,7 @@ class ETSContainer:
     def __init__(self, model_options_raw: Tuple[str], data_train: pd.Series):
 
         self.hyperparams = self._parse_hyperparams(model_options_raw)
-        self.equation = self._get_equation
+        self.equation = self._get_equation()
         self.model = self._init_model(data_train)
 
     def _parse_hyperparams(self, model_options_raw: Tuple[str]) -> ETSHyperparams:
