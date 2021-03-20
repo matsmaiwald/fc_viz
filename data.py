@@ -73,6 +73,11 @@ austourists_data = [
 ]
 
 
+def get_train_test_split_options(dataset_name: str):
+    if dataset_name == "S&P500":
+        return ("2020-01-01", "2021-01-01")
+
+
 def get_australian_tourist_data():
     t = pd.date_range("1999-03-01", "2015-12-01", freq="3MS")
     data_plot = pd.DataFrame({"# Tourists": austourists_data, "x": t})

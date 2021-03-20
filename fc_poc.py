@@ -1,12 +1,17 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-from statsmodels.tsa.exponential_smoothing.ets import ETSModel
 import seaborn as sns
 import matplotlib.pyplot as plt
+import re
+from models import get_model
 
 from sklearn.metrics import mean_squared_error
-from data import get_australian_tourist_data, get_fred_data
+from data import (
+    get_australian_tourist_data,
+    get_fred_data,
+    get_train_test_split_options,
+)
 import datetime
 
 
@@ -14,63 +19,56 @@ st.title("ETS Model Equation")
 
 dataset_option = st.sidebar.selectbox("dataset", ("australian_tourists", "S&P500"))
 test_start = st.sidebar.selectbox(
-    "train_test_cutoff", ("2010", "2012", "2014", "2020-01-01", "2021-01-01")
+    "train_test_cutoff", (get_train_test_split_options(dataset_option))
 )
 # test_start = datetime.datetime.strptime(test_start, "%Y")
-seasonality_option = st.sidebar.selectbox("seasonality", ("None", "add", "mul"))
-trend_option = st.sidebar.selectbox("trend", ("None", "add"))
-if trend_option == "add":
-    damped_trend = st.sidebar.selectbox("damped_trend", ("False", "True"))
-else:
-    damped_trend = False
-error_option = st.sidebar.selectbox("error", ("add", "mul"))
-damped_trend_option = True if damped_trend == "True" else False
-
-if seasonality_option == "None":
-    seasonality_option = None
-if trend_option == "None":
-    trend_option = None
-
-
-def get_equation(trend_opt, seasonality_opt, damped_opt, error_opt) -> str:
-    add_block = "l_{t-1}"
-    mult_block = ""
-    error_block = r"+ \epsilon_t"
-    if error_option == "mul":
-        error_block = r"*(1+\epsilon_t)"
-    if trend_opt == "add":
-        add_block += "+ b_{t-1}"
-
-    if seasonality_opt == "add":
-        add_block += "+ s_{t-m}"
-    if seasonality_opt == "mul":
-        mult_block = "* s_{t-m}"
-    eqn = f"y_t = ({add_block}) {mult_block} {error_block}"
-    return eqn
-
-
-st.latex(
-    get_equation(
-        trend_opt=trend_option,
-        seasonality_opt=seasonality_option,
-        damped_opt=damped_trend,
-        error_opt=error_option,
-    )
+model_options = (
+    "ETS: additive trend, additive seasonality",
+    "ETS: additive trend, multiplicative seasonality",
 )
+model_option_input = st.sidebar.selectbox("Model option", model_options)
+
+
+def parse_model_options_input(model_option_input: str):
+    groups = re.findall(r"^([A-z]+)\: ([A-z ]+)\, ([A-z ]+)", model_option_input)[0]
+    return groups
+
+
+model_option_parsed = parse_model_options_input(model_option_input)
+
+# def get_equation(trend_opt, seasonality_opt, damped_opt, error_opt) -> str:
+#     add_block = "l_{t-1}"
+#     mult_block = ""
+#     error_block = r"+ \epsilon_t"
+#     if error_option == "mul":
+#         error_block = r"*(1+\epsilon_t)"
+#     if trend_opt == "add":
+#         add_block += "+ b_{t-1}"
+
+#     if seasonality_opt == "add":
+#         add_block += "+ s_{t-m}"
+#     if seasonality_opt == "mul":
+#         mult_block = "* s_{t-m}"
+#     eqn = f"y_t = ({add_block}) {mult_block} {error_block}"
+#     return eqn
+
+
+# st.latex(
+#     get_equation(
+#         trend_opt=trend_option,
+#         seasonality_opt=seasonality_option,
+#         damped_opt=damped_trend,
+#         error_opt=error_option,
+#     )
+# )
 
 # if dataset_option == "australian_tourists":
 #     data, data_plot = get_australian_tourist_data()
+# if dataset_option == "S&P500":
 data = get_fred_data()
 data_train = data.loc[data.index < test_start]
 data_test = data.loc[data.index >= test_start]
-model = ETSModel(
-    data_train,
-    error=error_option,
-    trend=trend_option,
-    seasonal=seasonality_option,
-    damped_trend=damped_trend_option,
-    seasonal_periods=5,
-)
+model = get_model(model_option_parsed, data_train)
 fit = model.fit()
 
 # pred = fit.get_prediction(start=test_start.date(), end=max(data.index)).summary_frame(
