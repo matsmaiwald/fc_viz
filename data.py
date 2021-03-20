@@ -1,5 +1,6 @@
 import pandas as pd
 from numpy import NaN
+from typing import List, Tuple
 
 austourists_data = [
     30.05251300,
@@ -73,17 +74,11 @@ austourists_data = [
 ]
 
 
-def get_train_test_split_options(dataset_name: str):
-    if dataset_name == "S&P500":
-        return ("2020-01-01", "2021-01-01")
-
-
 def get_australian_tourist_data():
     t = pd.date_range("1999-03-01", "2015-12-01", freq="3MS")
-    data_plot = pd.DataFrame({"# Tourists": austourists_data, "x": t})
     data = pd.Series(austourists_data, index=t)
     data.name = "actuals"
-    return data, data_plot
+    return data, ("2010", "2012")
 
 
 def get_fred_data() -> pd.DataFrame:
@@ -93,8 +88,27 @@ def get_fred_data() -> pd.DataFrame:
     data = data.reindex(
         pd.bdate_range(min(data.index), max(data.index)), fill_value=NaN
     )
+    test_start_options = ("2020-01-01", "2021-01-01")
 
-    return data.interpolate()
+    return data.interpolate(), test_start_options
+
+
+dataset_name_mapping = {
+    "S&P500": get_fred_data,
+    "australian_tourists": get_australian_tourist_data,
+}
+
+
+class DataSet:
+    data: pd.Series
+    test_start_options: List[str]
+
+    def __init__(self, raw_name: str):
+        assert (
+            raw_name in dataset_name_mapping.keys()
+        ), f"Could not locate dataset: {dataset_name_mapping}"
+        get_data = dataset_name_mapping[raw_name]
+        self.data, self.test_start_options = get_data()
 
 
 if __name__ == "__main__":

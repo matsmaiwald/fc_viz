@@ -7,20 +7,15 @@ import re
 from models import get_model
 
 from sklearn.metrics import mean_squared_error
-from data import (
-    get_australian_tourist_data,
-    get_fred_data,
-    get_train_test_split_options,
-)
+from data import DataSet
 import datetime
 
 
 st.title("ETS Model Equation")
 
 dataset_option = st.sidebar.selectbox("dataset", ("australian_tourists", "S&P500"))
-test_start = st.sidebar.selectbox(
-    "train_test_cutoff", (get_train_test_split_options(dataset_option))
-)
+dataset = DataSet(dataset_option)
+test_start = st.sidebar.selectbox("train_test_cutoff", dataset.test_start_options)
 # test_start = datetime.datetime.strptime(test_start, "%Y")
 model_options = (
     "ETS: additive trend, additive seasonality",
@@ -36,27 +31,8 @@ def parse_model_options_box(model_option_input: str):
 
 model_option_parsed = parse_model_options_box(model_option_input)
 
-# def get_equation(trend_opt, seasonality_opt, damped_opt, error_opt) -> str:
-#     add_block = "l_{t-1}"
-#     mult_block = ""
-#     error_block = r"+ \epsilon_t"
-#     if error_option == "mul":
-#         error_block = r"*(1+\epsilon_t)"
-#     if trend_opt == "add":
-#         add_block += "+ b_{t-1}"
 
-#     if seasonality_opt == "add":
-#         add_block += "+ s_{t-m}"
-#     if seasonality_opt == "mul":
-#         mult_block = "* s_{t-m}"
-#     eqn = f"y_t = ({add_block}) {mult_block} {error_block}"
-#     return eqn
-
-
-# if dataset_option == "australian_tourists":
-#     data, data_plot = get_australian_tourist_data()
-# if dataset_option == "S&P500":
-data = get_fred_data()
+data = dataset.data
 data_train = data.loc[data.index < test_start]
 data_test = data.loc[data.index >= test_start]
 model = get_model(model_option_parsed, data_train)
@@ -98,17 +74,6 @@ st.title("Model Performance")
 st.text(f"In-sample RMSE: {round(mse_in_sample, 2)}")
 st.text(f"Out-of-sample RMSE: {round(mse_out_of_sample, 2)}")
 
-# sns.lineplot(data=df_plot, ax=ax_eval)
+
 st.pyplot(fig)
-
-# st.subheader("Sunpsots")
-# hist_values = np.histogram(data[DATE_COLUMN].dt.hour, bins=24, range=(0, 24))[0]
-# st.bar_chart(hist_values)
-
-# # Some number in the range 0-23
-# hour_to_filter = st.slider("hour", 0, 23, 17)
-# filtered_data = data[data[DATE_COLUMN].dt.hour == hour_to_filter]
-
-# st.subheader("Map of all pickups at %s:00" % hour_to_filter)
-# st.map(filtered_data)
 
