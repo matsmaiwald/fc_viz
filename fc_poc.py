@@ -26,15 +26,15 @@ model_options = (
     "ETS: additive trend, additive seasonality",
     "ETS: additive trend, multiplicative seasonality",
 )
-model_option_input = st.sidebar.selectbox("Model option", model_options)
+model_option_input = st.selectbox("Model option", model_options)
 
 
-def parse_model_options_input(model_option_input: str):
+def parse_model_options_box(model_option_input: str):
     groups = re.findall(r"^([A-z]+)\: ([A-z ]+)\, ([A-z ]+)", model_option_input)[0]
     return groups
 
 
-model_option_parsed = parse_model_options_input(model_option_input)
+model_option_parsed = parse_model_options_box(model_option_input)
 
 # def get_equation(trend_opt, seasonality_opt, damped_opt, error_opt) -> str:
 #     add_block = "l_{t-1}"
