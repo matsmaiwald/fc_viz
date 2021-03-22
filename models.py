@@ -29,10 +29,11 @@ class ETSContainer:
         season_option = (
             "mul" if "multiplicative seasonality" in model_options_raw else "add"
         )
+        n_seasons = 4 if "4 seasons" in model_options_raw else 5
         return ETSHyperparams(
             trend=trend_option,
             seasonality=season_option,
-            n_seasonal_periods=5,
+            n_seasonal_periods=n_seasons,
             error="add",
         )
 
