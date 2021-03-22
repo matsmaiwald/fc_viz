@@ -78,7 +78,7 @@ def get_australian_tourist_data():
     t = pd.date_range("1999-03-01", "2015-12-01", freq="3MS")
     data = pd.Series(austourists_data, index=t)
     data.name = "actuals"
-    return data, ("2010", "2012")
+    return data, ("2009", "2011", "2013", "2015")
 
 
 def get_fred_data() -> pd.DataFrame:
@@ -88,7 +88,13 @@ def get_fred_data() -> pd.DataFrame:
     data = data.reindex(
         pd.bdate_range(min(data.index), max(data.index)), fill_value=NaN
     )
-    test_start_options = ("2020-01-01", "2021-01-01")
+    test_start_options = (
+        "2020-01-01",
+        "2020-03-01",
+        "2020-06-01",
+        "2020-09-01",
+        "2021-01-01",
+    )
 
     return data.interpolate(), test_start_options
 
