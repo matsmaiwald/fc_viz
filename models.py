@@ -1,12 +1,15 @@
 from typing import List, Tuple, Dict, Union
 import pandas as pd
 from statsmodels.tsa.exponential_smoothing.ets import ETSModel, ETSResults
+from statsmodels.tsa.arima.model import ARIMA, ARIMAResults
 from collections import namedtuple
 
 
 def get_model(model_option_parsed: Tuple[str], data_train: pd.DataFrame):
     if "ETS" in model_option_parsed:
         model = ETSContainer(model_option_parsed, data_train)
+    if "ARIMA" in model_option_parsed:
+        model = ARIMAContainer(model_option_parsed, data_train)
     return model
 
 
@@ -65,3 +68,15 @@ class ETSContainer:
 
     def fit(self) -> ETSResults:
         return self.model.fit()
+
+
+class ARIMAContainer:
+    def __init__(self, model_options_raw: Tuple[str], data_train: pd.Series):
+        self.model = ARIMA(data_train, order=(5, 1, 1))
+        self.equation = self._get_equation()
+
+    def fit(self) -> ARIMAResults:
+        return self.model.fit()
+
+    def _get_equation(self) -> str:
+        return "TODO: add equation"
