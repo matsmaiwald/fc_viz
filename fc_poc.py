@@ -16,14 +16,18 @@ dataset = DataSet(dataset_option)
 test_start = st.sidebar.selectbox("train_test_cutoff", dataset.test_start_options)
 
 model_options = (
-    "ETS: additive trend, additive seasonality",
-    "ETS: additive trend, multiplicative seasonality",
+    "ETS: additive trend, additive seasonality, 4 seasons",
+    "ETS: additive trend, additive seasonality, 4 seasons",
+    "ETS: additive trend, multiplicative seasonality, 5 seasons",
+    "ETS: additive trend, multiplicative seasonality, 5 seasons",
 )
 model_option_input = st.selectbox("Model option", model_options)
 
 
 def parse_model_options_box(model_option_input: str):
-    groups = re.findall(r"^([A-z]+)\: ([A-z ]+)\, ([A-z ]+)", model_option_input)[0]
+    groups = re.findall(
+        r"^([A-z]+)\: ([A-z ]+)\, ([A-z ]+), ([A-z ,0-9]+)", model_option_input
+    )[0]
     return groups
 
 
