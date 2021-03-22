@@ -20,6 +20,7 @@ model_options = (
     "ETS: additive trend, additive seasonality, 4 seasons",
     "ETS: additive trend, multiplicative seasonality, 5 seasons",
     "ETS: additive trend, multiplicative seasonality, 5 seasons",
+    "ARIMA: additive trend, multiplicative seasonality, 5 seasons",
 )
 model_option_input = st.selectbox("Model option", model_options)
 
