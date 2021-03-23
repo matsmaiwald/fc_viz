@@ -16,29 +16,42 @@ dataset = DataSet(dataset_option)
 test_start = st.sidebar.selectbox("train_test_cutoff", dataset.test_start_options)
 
 model_options = (
+    "ARIMA(p=1, d=0, q=0)",
+    "ARIMA(p=10, d=0, q=0)",
+    "ARIMA(p=1, d=1, q=0)",
+    "ARIMA(p=10, d=1, q=0)",
+    "ARIMA(p=1, d=1, q=1)",
+    "ARIMA(p=10, d=1, q=1)",
     "ETS: additive trend, additive seasonality, 4 seasons",
-    "ETS: additive trend, additive seasonality, 4 seasons",
+    "ETS: additive trend, additive seasonality, 5 seasons",
+    "ETS: additive trend, multiplicative seasonality, 4 seasons",
     "ETS: additive trend, multiplicative seasonality, 5 seasons",
-    "ETS: additive trend, multiplicative seasonality, 5 seasons",
-    "ARIMA: additive trend, multiplicative seasonality, 5 seasons",
 )
 model_option_input = st.selectbox("Model option", model_options)
 
 
 def parse_model_options_box(model_option_input: str):
-    groups = re.findall(
-        r"^([A-z]+)\: ([A-z ]+)\, ([A-z ]+), ([A-z ,0-9]+)", model_option_input
-    )[0]
-    return groups
+    if model_option_input.startswith("ETS"):
+        groups = re.findall(
+            r"^([A-z]+)\: ([A-z ]+)\, ([A-z ]+), ([A-z ,0-9]+)", model_option_input
+        )[0]
+        model_type = "ETS"
+    if model_option_input.startswith("ARIMA"):
+        groups = re.findall(
+            r"p\=([0-9]+), d\=([0-9]+), q\=([0-9]+)", model_option_input
+        )[0]
+        model_type = "ARIMA"
+
+    return model_type, groups
 
 
 # GET MODEL AND FORECASTS
-model_option_parsed = parse_model_options_box(model_option_input)
+model_type, model_option_parsed = parse_model_options_box(model_option_input)
 
 data = dataset.data
 data_train = data.loc[data.index < test_start]
 data_test = data.loc[data.index >= test_start]
-model = get_model(model_option_parsed, data_train)
+model = get_model(model_type, model_option_parsed, data_train)
 fit = model.fit()
 
 st.latex(model.equation)

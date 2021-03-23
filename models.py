@@ -5,10 +5,12 @@ from statsmodels.tsa.arima.model import ARIMA, ARIMAResults
 from collections import namedtuple
 
 
-def get_model(model_option_parsed: Tuple[str], data_train: pd.DataFrame):
-    if "ETS" in model_option_parsed:
+def get_model(
+    model_type: str, model_option_parsed: Tuple[str], data_train: pd.DataFrame
+):
+    if model_type == "ETS":
         model = ETSContainer(model_option_parsed, data_train)
-    if "ARIMA" in model_option_parsed:
+    elif model_type == "ARIMA":
         model = ARIMAContainer(model_option_parsed, data_train)
     return model
 
@@ -16,6 +18,7 @@ def get_model(model_option_parsed: Tuple[str], data_train: pd.DataFrame):
 ETSHyperparams = namedtuple(
     "ETSHyperparams", ["trend", "seasonality", "n_seasonal_periods", "error"]
 )
+ARIMAHyperparams = namedtuple("ARIMAHyperparams", ["p", "d", "q"])
 
 
 class ETSContainer:
@@ -72,8 +75,23 @@ class ETSContainer:
 
 class ARIMAContainer:
     def __init__(self, model_options_raw: Tuple[str], data_train: pd.Series):
-        self.model = ARIMA(data_train, order=(5, 1, 1))
+        self.hyperparams = self._parse_hyperparams(model_options_raw)
+        self.model = self._init_model(data_train)
         self.equation = self._get_equation()
+
+    def _parse_hyperparams(self, model_options_raw: Tuple[str]) -> ARIMAHyperparams:
+        return ARIMAHyperparams(
+            p=int(model_options_raw[0]),
+            d=int(model_options_raw[1]),
+            q=int(model_options_raw[2]),
+        )
+
+    def _init_model(self, data_train) -> ARIMA:
+        model = ARIMA(
+            data_train,
+            order=(self.hyperparams.p, self.hyperparams.d, self.hyperparams.q),
+        )
+        return model
 
     def fit(self) -> ARIMAResults:
         return self.model.fit()
