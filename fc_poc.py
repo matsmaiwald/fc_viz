@@ -16,7 +16,10 @@ dataset = DataSet(dataset_option)
 test_start = st.sidebar.selectbox("train_test_cutoff", dataset.test_start_options)
 
 model_options = (
+    "Prophet",
     "ARIMA(p=1, d=0, q=0)",
+    "ARIMA(p=0, d=1, q=0) -- random walk",
+    "ARIMA(p=0, d=1, q=1) -- simple exponential smoothing with growth",
     "ARIMA(p=10, d=0, q=0)",
     "ARIMA(p=1, d=1, q=0)",
     "ARIMA(p=10, d=1, q=0)",
@@ -41,6 +44,10 @@ def parse_model_options_box(model_option_input: str):
             r"p\=([0-9]+), d\=([0-9]+), q\=([0-9]+)", model_option_input
         )[0]
         model_type = "ARIMA"
+
+    if model_option_input.startswith("Prophet"):
+        groups = "empty"
+        model_type = "Prophet"
 
     return model_type, groups
 

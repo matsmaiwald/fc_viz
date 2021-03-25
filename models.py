@@ -3,6 +3,7 @@ import pandas as pd
 from statsmodels.tsa.exponential_smoothing.ets import ETSModel, ETSResults
 from statsmodels.tsa.arima.model import ARIMA, ARIMAResults
 from collections import namedtuple
+from fbprophet import Prophet
 
 
 def get_model(
@@ -12,6 +13,9 @@ def get_model(
         model = ETSContainer(model_option_parsed, data_train)
     elif model_type == "ARIMA":
         model = ARIMAContainer(model_option_parsed, data_train)
+    elif model_type == "Prophet":
+        model = ProphetContainer(model_option_parsed, data_train)
+
     return model
 
 
@@ -98,3 +102,43 @@ class ARIMAContainer:
 
     def _get_equation(self) -> str:
         return "TODO: add equation"
+
+
+class ProphetContainer:
+    def __init__(self, model_options_raw: Tuple[str], data_train: pd.Series):
+        # self.hyperparams = self._parse_hyperparams(model_options_raw)
+        self.model = self._init_model()
+        self.data_train = data_train
+        self.equation = self._get_equation()
+
+    def _parse_hyperparams(self, model_options_raw: Tuple[str]) -> ARIMAHyperparams:
+        pass
+
+    def _init_model(self) -> Prophet:
+        model = Prophet()
+        return model
+
+    @staticmethod
+    def _prep_data(data: pd.Series):
+        data_prep = data.copy()
+        data_prep.name = "y"
+        data_prep = data_prep.reset_index().rename(columns={"index": "ds"})
+        return data_prep
+
+    def fit(self) -> ARIMAResults:
+        data_prep = self._prep_data(self.data_train)
+        model_trained = ProphetTrained(model=self.model.fit(data_prep))
+        return model_trained
+
+    def _get_equation(self) -> str:
+        return "TODO: add equation"
+
+
+class ProphetTrained:
+    def __init__(self, model):
+        self.model = model
+
+    def forecast(self, steps: int):
+        data_future = self.model.make_future_dataframe(periods=steps)
+
+        return self.model.predict(data_future)
