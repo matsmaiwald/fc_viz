@@ -63,35 +63,46 @@ fit = model.fit()
 
 st.latex(model.equation)
 
-pred = fit.forecast(steps=(data_test.index.size))
-
-mse_in_sample = mean_squared_error(data_train, fit.fittedvalues)
+pred = fit.forecast(steps=data_test.index.size)
+try:
+    mse_in_sample = mean_squared_error(data_train, fit.fittedvalues)
+except AttributeError:
+    pass
 mse_out_of_sample = mean_squared_error(data_test, pred)
 
 
 # CREATE PLOT
-df_plot = pd.concat(
-    [
-        data.rename("actuals"),
-        pred.rename("predictions"),
-        fit.fittedvalues.rename("fitted_values"),
-    ],
-    axis=1,
-)
+try:
+    df_plot = pd.concat(
+        [
+            data.rename("actuals"),
+            pred.rename("predictions"),
+            fit.fittedvalues.rename("fitted_values"),
+        ],
+        axis=1,
+    )
+except AttributeError:
+    df_plot = pd.concat([data.rename("actuals"), pred.rename("predictions"),], axis=1,)
 
 fig, ax_eval = plt.subplots()
 
 
 df_plot["actuals"].plot(label="actuals", legend=True, ax=ax_eval, alpha=0.5)
-df_plot.loc[df_plot.index < test_start]["fitted_values"].plot(
-    label="mean_in_sample", legend=True, ax=ax_eval
-)
+try:
+    df_plot.loc[df_plot.index < test_start]["fitted_values"].plot(
+        label="mean_in_sample", legend=True, ax=ax_eval
+    )
+except KeyError:
+    pass
 df_plot.loc[df_plot.index >= test_start]["predictions"].plot(
     label="mean_out_of_sample", legend=True, ax=ax_eval
 )
 
 st.title("Model Performance")
-st.text(f"In-sample RMSE: {round(mse_in_sample, 2)}")
+try:
+    st.text(f"In-sample RMSE: {round(mse_in_sample, 2)}")
+except NameError:
+    pass
 st.text(f"Out-of-sample RMSE: {round(mse_out_of_sample, 2)}")
 
 

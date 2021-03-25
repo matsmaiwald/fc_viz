@@ -141,4 +141,4 @@ class ProphetTrained:
     def forecast(self, steps: int):
         data_future = self.model.make_future_dataframe(periods=steps)
 
-        return self.model.predict(data_future)
+        return self.model.predict(data_future).iloc[-28:]["yhat"]
