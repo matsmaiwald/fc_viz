@@ -1,0 +1,6 @@
+{
+    "python.formatting.provider": "black",
+    "python.formatting.blackPath": "/usr/local/bin/black",
+    "editor.formatOnSave": true,
+    "python.pythonPath": "/usr/local/bin/python"
+}
