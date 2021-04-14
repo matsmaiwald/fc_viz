@@ -2,7 +2,7 @@
 FROM python:3.8-buster
 # install build utilities
 RUN apt-get update && \
-    apt-get install -y gcc make apt-transport-https ca-certificates build-essential
+    apt-get install -y gcc g++ python-dev python3-dev make apt-transport-https ca-certificates build-essential zsh
 
 # check our python environment
 RUN python3 --version
@@ -15,6 +15,9 @@ WORKDIR  /usr/src/fc_viz
 COPY requirements_general.txt .
 RUN --mount=type=cache,mode=0755,target=/root/.cache/pip pip install --no-cache-dir -r requirements_general.txt
 
+COPY requirements_prophet.txt .
+RUN --mount=type=cache,mode=0755,target=/root/.cache/pip pip install --no-cache-dir -r requirements_prophet.txt
+# RUN pip install holidays tqdm
 COPY requirements.txt .
 RUN --mount=type=cache,mode=0755,target=/root/.cache/pip pip install --no-cache-dir -r requirements.txt
 
@@ -23,4 +26,5 @@ COPY src/ /src/
 RUN ls -la /src/*
 
 # Running Python Application
-CMD ["python3", "/src/fc_poc.py"]
+# CMD ["python3", "/src/fc_poc.py"]
+CMD ["/bin/zsh"]
