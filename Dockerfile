@@ -22,8 +22,8 @@ COPY requirements.txt .
 RUN --mount=type=cache,mode=0755,target=/root/.cache/pip pip install --no-cache-dir -r requirements.txt
 
 # Copy all the files from the project’s root to the working directory
-COPY src/ /src/
-RUN ls -la /src/*
+# COPY src/ /src/
+# RUN ls -la /src/*
 
 # Running Python Application
 # CMD ["python3", "/src/fc_poc.py"]
