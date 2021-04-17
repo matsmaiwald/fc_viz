@@ -11,9 +11,9 @@ from data import DataSet
 # SET UP INPUT
 st.title("ETS Model Equation")
 
-dataset_option = st.sidebar.selectbox("dataset", ("australian_tourists", "S&P500"))
+dataset_option = st.sidebar.selectbox("dataset", ("australian_tourists", "S&P500", "airline"))
 dataset = DataSet(dataset_option)
-test_start = st.sidebar.selectbox("train_test_cutoff", dataset.test_start_options)
+test_start = st.sidebar.selectbox("train_test_cutoff", dataset.split_options)
 
 model_options = (
     "Prophet",
@@ -82,7 +82,13 @@ try:
         axis=1,
     )
 except AttributeError:
-    df_plot = pd.concat([data.rename("actuals"), pred.rename("predictions"),], axis=1,)
+    df_plot = pd.concat(
+        [
+            data.rename("actuals"),
+            pred.rename("predictions"),
+        ],
+        axis=1,
+    )
 
 fig, ax_eval = plt.subplots()
 
@@ -107,4 +113,3 @@ st.text(f"Out-of-sample RMSE: {round(mse_out_of_sample, 2)}")
 
 
 st.pyplot(fig)
-

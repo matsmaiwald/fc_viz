@@ -1,6 +1,7 @@
 import pandas as pd
 from numpy import NaN
 from typing import List, Tuple
+import sktime.datasets.base as skdata
 
 austourists_data = [
     30.05251300,
@@ -74,11 +75,18 @@ austourists_data = [
 ]
 
 
+def get_airline_data():
+    data = skdata.load_airline()
+    return data
+    # , list(map(lambda x: x.strftime("%Y-%m"), data.index[-5:-2]))
+
+
 def get_australian_tourist_data():
     t = pd.date_range("1999-03-01", "2015-12-01", freq="3MS")
     data = pd.Series(austourists_data, index=t)
     data.name = "actuals"
-    return data, ("2009", "2011", "2013", "2015")
+    return data
+    # return data, data.index[-5:-2]
 
 
 def get_fred_data() -> pd.DataFrame:
@@ -96,26 +104,42 @@ def get_fred_data() -> pd.DataFrame:
         "2021-01-01",
     )
 
-    return data.interpolate(), test_start_options
+    return data.interpolate()
 
 
 dataset_name_mapping = {
     "S&P500": get_fred_data,
     "australian_tourists": get_australian_tourist_data,
+    "airline": get_airline_data
 }
 
 
 class DataSet:
     data: pd.Series
-    test_start_options: List[str]
+    split_options: List[str]
+
+    @staticmethod
+    def _get_train_test_split_options(data: pd.DataFrame):
+        split_options_ix = list(map(lambda x: int(x*data.index.size), [0.5, 0.6, 0.7, 0.8, 0.9]))
+        split_options = data.index[split_options_ix]
+        return split_options
+
+
 
     def __init__(self, raw_name: str):
         assert (
             raw_name in dataset_name_mapping.keys()
         ), f"Could not locate dataset: {dataset_name_mapping}"
-        get_data = dataset_name_mapping[raw_name]
-        self.data, self.test_start_options = get_data()
+        data_fun = dataset_name_mapping[raw_name]
+        self.data = data_fun()
+
+        split_options = self._get_train_test_split_options(self.data)
+        self.split_options = list(
+        map(lambda x: x.strftime("%Y-%m-%d"), split_options)
+            )
+        
 
 
 if __name__ == "__main__":
-    get_fred_data()
+    print(DataSet("australian_tourists").split_options)
+    print(DataSet("airline").split_options)
