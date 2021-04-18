@@ -1,13 +1,14 @@
 import pandas as pd
 from numpy import NaN
-from typing import List, Tuple
+from typing import List
 import sktime.datasets.base as skdata
 
 
 def get_australian_tourist_data():
-    austourists_data = pd.read_csv("/src/data_raw/australian_tourists.csv")
+    data = pd.read_csv("/src/data_raw/australian_tourists.csv", index_col=False)
+
     t = pd.date_range("1999-03-01", "2015-12-01", freq="3MS")
-    data = pd.Series(austourists_data, index=t)
+    data = pd.Series(data.australian_tourists.values, index=t)
     data.name = "actuals"
     return data
     # return data, data.index[-5:-2]
@@ -48,7 +49,7 @@ class DataSet:
     def __init__(self, raw_name: str):
         assert (
             raw_name in dataset_name_mapping.keys()
-        ), f"Could not locate dataset: {dataset_name_mapping}"
+        ), f"Could not locate dataset: {raw_name}"
         self.data = dataset_name_mapping[raw_name]
 
         split_options = self._get_train_test_split_options(self.data)
@@ -57,4 +58,9 @@ class DataSet:
 
 if __name__ == "__main__":
     print(DataSet("australian_tourists").split_options)
-    print(DataSet("airline").split_options)
+    print(DataSet("airline_passengers").split_options)
+    print(DataSet("australian_tourists").data)
+    import pdb
+
+    pdb.set_trace()
+    print(DataSet("airline_passengers").data)
