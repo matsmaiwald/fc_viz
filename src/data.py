@@ -5,7 +5,7 @@ import sktime.datasets.base as skdata
 
 
 def get_australian_tourist_data():
-    austourists_data = pd.read_csv("/src/australian_tourists.csv")
+    austourists_data = pd.read_csv("/src/data_raw/australian_tourists.csv")
     t = pd.date_range("1999-03-01", "2015-12-01", freq="3MS")
     data = pd.Series(austourists_data, index=t)
     data.name = "actuals"
@@ -14,7 +14,7 @@ def get_australian_tourist_data():
 
 
 def get_fred_data() -> pd.DataFrame:
-    data = pd.read_csv("/src/SP500.csv", na_values=".", parse_dates=True)
+    data = pd.read_csv("/src/data_raw/SP500.csv", na_values=".", parse_dates=True)
     data["DATE"] = pd.to_datetime(data["DATE"])
     data = data.set_index("DATE")["SP500"]
     data = data.reindex(
