@@ -75,10 +75,19 @@ austourists_data = [
 ]
 
 
-def get_airline_data():
+def get_airline_passenger_data():
     data = skdata.load_airline()
     return data
     # , list(map(lambda x: x.strftime("%Y-%m"), data.index[-5:-2]))
+
+
+def get_shampoo_sales_data():
+    data = skdata.load_shampoo_sales()
+    return data
+
+
+def get_lynx_population_data():
+    return skdata.load_lynx()
 
 
 def get_australian_tourist_data():
@@ -90,7 +99,7 @@ def get_australian_tourist_data():
 
 
 def get_fred_data() -> pd.DataFrame:
-    data = pd.read_csv("SP500.csv", na_values=".", parse_dates=True)
+    data = pd.read_csv("/src/SP500.csv", na_values=".", parse_dates=True)
     data["DATE"] = pd.to_datetime(data["DATE"])
     data = data.set_index("DATE")["SP500"]
     data = data.reindex(
@@ -110,7 +119,9 @@ def get_fred_data() -> pd.DataFrame:
 dataset_name_mapping = {
     "S&P500": get_fred_data,
     "australian_tourists": get_australian_tourist_data,
-    "airline": get_airline_data
+    "airline_passengers": get_airline_passenger_data,
+    "shampoo_sales": get_shampoo_sales_data,
+    "lynx_population": get_lynx_population_data,
 }
 
 
@@ -120,11 +131,11 @@ class DataSet:
 
     @staticmethod
     def _get_train_test_split_options(data: pd.DataFrame):
-        split_options_ix = list(map(lambda x: int(x*data.index.size), [0.5, 0.6, 0.7, 0.8, 0.9]))
+        split_options_ix = list(
+            map(lambda x: int(x * data.index.size), [0.5, 0.6, 0.7, 0.8, 0.9])
+        )
         split_options = data.index[split_options_ix]
         return split_options
-
-
 
     def __init__(self, raw_name: str):
         assert (
@@ -134,10 +145,7 @@ class DataSet:
         self.data = data_fun()
 
         split_options = self._get_train_test_split_options(self.data)
-        self.split_options = list(
-        map(lambda x: x.strftime("%Y-%m-%d"), split_options)
-            )
-        
+        self.split_options = list(map(lambda x: x.strftime("%Y-%m-%d"), split_options))
 
 
 if __name__ == "__main__":
