@@ -75,21 +75,6 @@ austourists_data = [
 ]
 
 
-def get_airline_passenger_data():
-    data = skdata.load_airline()
-    return data
-    # , list(map(lambda x: x.strftime("%Y-%m"), data.index[-5:-2]))
-
-
-def get_shampoo_sales_data():
-    data = skdata.load_shampoo_sales()
-    return data
-
-
-def get_lynx_population_data():
-    return skdata.load_lynx()
-
-
 def get_australian_tourist_data():
     t = pd.date_range("1999-03-01", "2015-12-01", freq="3MS")
     data = pd.Series(austourists_data, index=t)
@@ -117,11 +102,11 @@ def get_fred_data() -> pd.DataFrame:
 
 
 dataset_name_mapping = {
-    "S&P500": get_fred_data,
-    "australian_tourists": get_australian_tourist_data,
-    "airline_passengers": get_airline_passenger_data,
-    "shampoo_sales": get_shampoo_sales_data,
-    "lynx_population": get_lynx_population_data,
+    "S&P500": get_fred_data(),
+    "australian_tourists": get_australian_tourist_data(),
+    "airline_passengers": skdata.load_airline(),
+    "shampoo_sales": skdata.load_shampoo_sales(),
+    "lynx_population": skdata.load_lynx(),
 }
 
 
@@ -141,8 +126,7 @@ class DataSet:
         assert (
             raw_name in dataset_name_mapping.keys()
         ), f"Could not locate dataset: {dataset_name_mapping}"
-        data_fun = dataset_name_mapping[raw_name]
-        self.data = data_fun()
+        self.data = dataset_name_mapping[raw_name]
 
         split_options = self._get_train_test_split_options(self.data)
         self.split_options = list(map(lambda x: x.strftime("%Y-%m-%d"), split_options))
