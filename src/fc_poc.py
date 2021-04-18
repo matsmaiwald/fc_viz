@@ -6,12 +6,12 @@ import re
 from models import get_model
 
 from sklearn.metrics import mean_squared_error
-from data import DataSet
+from data import DataSet, dataset_name_mapping
 
 # SET UP INPUT
 st.title("ETS Model Equation")
 
-dataset_option = st.sidebar.selectbox("dataset", ("australian_tourists", "S&P500", "airline"))
+dataset_option = st.sidebar.selectbox("dataset", list(dataset_name_mapping.keys()))
 dataset = DataSet(dataset_option)
 test_start = st.sidebar.selectbox("train_test_cutoff", dataset.split_options)
 
@@ -82,13 +82,7 @@ try:
         axis=1,
     )
 except AttributeError:
-    df_plot = pd.concat(
-        [
-            data.rename("actuals"),
-            pred.rename("predictions"),
-        ],
-        axis=1,
-    )
+    df_plot = pd.concat([data.rename("actuals"), pred.rename("predictions"),], axis=1,)
 
 fig, ax_eval = plt.subplots()
 
