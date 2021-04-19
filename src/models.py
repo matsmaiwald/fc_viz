@@ -143,18 +143,8 @@ class ProphetContainer:
 
     def fit(self) -> ARIMAResults:
         data_prep = self._prep_data(self.data_train)
-        model_trained = ProphetTrained(model=self.model.fit(data_prep))
+        model_trained = self.model.fit(data_prep)
         return model_trained
 
     def _get_equation(self) -> str:
         return "TODO: add equation"
-
-
-class ProphetTrained:
-    def __init__(self, model):
-        self.model = model
-
-    def forecast(self, steps: int):
-        # data_future = self.model.make_future_dataframe(periods=steps)
-
-        return self.model.predict(fh=[i for i in range(1, steps + 1)])
