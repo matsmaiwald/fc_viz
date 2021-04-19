@@ -1,7 +1,7 @@
 from typing import List, Tuple, Dict, Union
 import pandas as pd
-from statsmodels.tsa.exponential_smoothing.ets import ETSModel, ETSResults
 from statsmodels.tsa.arima.model import ARIMA, ARIMAResults
+from sktime.forecasting.exp_smoothing import ExponentialSmoothing
 from collections import namedtuple
 from sktime.forecasting.fbprophet import Prophet
 from sktime.forecasting.naive import NaiveForecaster
@@ -45,7 +45,8 @@ class ETSContainer:
 
         self.hyperparams = self._parse_hyperparams(model_options_raw)
         self.equation = self._get_equation()
-        self.model = self._init_model(data_train)
+        self.model = self._init_model()
+        self.data_train = data_train
 
     def _parse_hyperparams(self, model_options_raw: Tuple[str]) -> ETSHyperparams:
         trend_option = "mul" if "multiplicative trend" in model_options_raw else "add"
@@ -60,13 +61,13 @@ class ETSContainer:
             error="add",
         )
 
-    def _init_model(self, data_train) -> ETSModel:
-        model = ETSModel(
-            data_train,
-            error=self.hyperparams.error,
+    def _init_model(self) -> ExponentialSmoothing:
+        model = ExponentialSmoothing(
+            # data_train,
+            # error=self.hyperparams.error,
             trend=self.hyperparams.trend,
             seasonal=self.hyperparams.seasonality,
-            seasonal_periods=self.hyperparams.n_seasonal_periods,
+            sp=self.hyperparams.n_seasonal_periods,
         )
         return model
 
@@ -86,8 +87,8 @@ class ETSContainer:
         eqn = f"y_t = ({add_block}) {mult_block} {error_block}"
         return eqn
 
-    def fit(self) -> ETSResults:
-        return self.model.fit()
+    def fit(self):
+        return self.model.fit(self.data_train)
 
 
 class ARIMAContainer:
@@ -121,7 +122,9 @@ class ProphetContainer:
     def __init__(self, model_options_raw: Tuple[str], data_train: pd.Series):
         # self.hyperparams = self._parse_hyperparams(model_options_raw)
         self.model = self._init_model()
-        self.data_train = data_train
+        self.data_train = (
+            data_train.to_timestamp()
+        )  # TODO move this to the data as an option
         self.equation = self._get_equation()
 
     def _parse_hyperparams(self, model_options_raw: Tuple[str]) -> ARIMAHyperparams:

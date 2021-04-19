@@ -9,6 +9,8 @@ def get_australian_tourist_data():
 
     t = pd.date_range("1999-03-01", "2015-12-01", freq="3MS")
     data = pd.Series(data.australian_tourists.values, index=t)
+    data.index = pd.PeriodIndex(data.index, freq="3M")
+
     # data.index = pd.PeriodIndex(data.index, freq="3MS")
     data.name = "actuals"
     return data
@@ -27,11 +29,11 @@ def get_fred_data() -> pd.DataFrame:
 
 
 def get_airline_data():
-    return skdata.load_airline().to_timestamp(freq="M")
+    return skdata.load_airline()
 
 
 def get_lynx_population():
-    return skdata.load_lynx().to_timestamp(freq="Y")
+    return skdata.load_lynx()
 
 
 dataset_name_mapping = {
