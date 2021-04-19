@@ -3,7 +3,7 @@ import pandas as pd
 from statsmodels.tsa.exponential_smoothing.ets import ETSModel, ETSResults
 from statsmodels.tsa.arima.model import ARIMA, ARIMAResults
 from collections import namedtuple
-from fbprophet import Prophet
+from sktime.forecasting.fbprophet import Prophet
 
 
 def get_model(
@@ -121,8 +121,11 @@ class ProphetContainer:
     @staticmethod
     def _prep_data(data: pd.Series):
         data_prep = data.copy()
-        data_prep.name = "y"
-        data_prep = data_prep.reset_index().rename(columns={"index": "ds"})
+        try:
+            data_prep.index = data_prep.index.to_timestamp()
+        except AttributeError as e:
+            pass
+        # data_prep = data_prep.reset_index().rename(columns={"index": "ds"})
         return data_prep
 
     def fit(self) -> ARIMAResults:
@@ -139,6 +142,6 @@ class ProphetTrained:
         self.model = model
 
     def forecast(self, steps: int):
-        data_future = self.model.make_future_dataframe(periods=steps)
+        # data_future = self.model.make_future_dataframe(periods=steps)
 
-        return self.model.predict(data_future).iloc[-28:]["yhat"]
+        return self.model.predict(fh=[i for i in range(1, steps + 1)])
