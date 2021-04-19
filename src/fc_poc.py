@@ -16,6 +16,7 @@ dataset = DataSet(dataset_option)
 test_start = st.sidebar.selectbox("train_test_cutoff", dataset.split_options)
 
 model_options = (
+    "Naive",
     "Prophet",
     "ARIMA(p=1, d=0, q=0)",
     "ARIMA(p=0, d=1, q=0) -- random walk",
@@ -49,6 +50,10 @@ def parse_model_options_box(model_option_input: str):
         groups = "empty"
         model_type = "Prophet"
 
+    if model_option_input.startswith("Naive"):
+        groups = "empty"
+        model_type = "Naive"
+
     return model_type, groups
 
 
@@ -63,7 +68,7 @@ fit = model.fit()
 
 st.latex(model.equation)
 
-pred = fit.forecast(steps=data_test.index.size)
+pred = fit.predict(fh=[i for i in range(1, data_test.index.size + 1)])
 try:
     mse_in_sample = mean_squared_error(data_train, fit.fittedvalues)
 except AttributeError:

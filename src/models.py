@@ -4,6 +4,7 @@ from statsmodels.tsa.exponential_smoothing.ets import ETSModel, ETSResults
 from statsmodels.tsa.arima.model import ARIMA, ARIMAResults
 from collections import namedtuple
 from sktime.forecasting.fbprophet import Prophet
+from sktime.forecasting.naive import NaiveForecaster
 
 
 def get_model(
@@ -15,6 +16,8 @@ def get_model(
         model = ARIMAContainer(model_option_parsed, data_train)
     elif model_type == "Prophet":
         model = ProphetContainer(model_option_parsed, data_train)
+    elif model_type == "Naive":
+        model = NaiveContainer(data_train)
 
     return model
 
@@ -23,6 +26,16 @@ ETSHyperparams = namedtuple(
     "ETSHyperparams", ["trend", "seasonality", "n_seasonal_periods", "error"]
 )
 ARIMAHyperparams = namedtuple("ARIMAHyperparams", ["p", "d", "q"])
+
+
+class NaiveContainer:
+    def __init__(self, data_train: pd.Series):
+        self.model = NaiveForecaster()
+        self.data_train = data_train
+        self.equation = "TODO"
+
+    def fit(self):
+        return self.model.fit(self.data_train)
 
 
 class ETSContainer:
