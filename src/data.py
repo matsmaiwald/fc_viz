@@ -9,6 +9,7 @@ def get_australian_tourist_data():
 
     t = pd.date_range("1999-03-01", "2015-12-01", freq="3MS")
     data = pd.Series(data.australian_tourists.values, index=t)
+    # data.index = pd.PeriodIndex(data.index, freq="3MS")
     data.name = "actuals"
     return data
     # return data, data.index[-5:-2]
@@ -25,10 +26,14 @@ def get_fred_data() -> pd.DataFrame:
     return data.interpolate()
 
 
+def get_airline_data():
+    return skdata.load_airline().to_timestamp(freq="M")
+
+
 dataset_name_mapping = {
     "S&P500": get_fred_data(),
     "australian_tourists": get_australian_tourist_data(),
-    "airline_passengers": skdata.load_airline(),
+    "airline_passengers": get_airline_data(),
     "shampoo_sales": skdata.load_shampoo_sales(),
     "lynx_population": skdata.load_lynx(),
 }
