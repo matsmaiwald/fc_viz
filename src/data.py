@@ -30,12 +30,16 @@ def get_airline_data():
     return skdata.load_airline().to_timestamp(freq="M")
 
 
+def get_lynx_population():
+    return skdata.load_lynx().to_timestamp(freq="Y")
+
+
 dataset_name_mapping = {
     "S&P500": get_fred_data(),
     "australian_tourists": get_australian_tourist_data(),
     "airline_passengers": get_airline_data(),
     "shampoo_sales": skdata.load_shampoo_sales(),
-    "lynx_population": skdata.load_lynx(),
+    "lynx_population": get_lynx_population(),
 }
 
 
