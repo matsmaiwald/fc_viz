@@ -6,13 +6,13 @@ import re
 from models import get_model
 
 from sklearn.metrics import mean_squared_error
-from data import DataSet, dataset_name_mapping
+from data import dataset_name_mapping, get_dataset
 
 # SET UP INPUT
 st.title("ETS Model Equation")
 
 dataset_option = st.sidebar.selectbox("dataset", list(dataset_name_mapping.keys()))
-dataset = DataSet(dataset_option)
+dataset = get_dataset(dataset_option)
 test_start = st.sidebar.selectbox("train_test_cutoff", dataset.split_options)
 
 model_options = (
@@ -60,11 +60,11 @@ def parse_model_options_box(model_option_input: str):
 # GET MODEL AND FORECASTS
 model_type, model_option_parsed = parse_model_options_box(model_option_input)
 
-data = dataset.data
+model = get_model(model_type, model_option_parsed)
+data = model.prep_data(dataset)
 data_train = data.loc[data.index < test_start]
 data_test = data.loc[data.index >= test_start]
-model = get_model(model_type, model_option_parsed, data_train)
-fit = model.fit()
+fit = model.fit(data_train)
 
 st.latex(model.equation)
 

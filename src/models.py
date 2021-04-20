@@ -5,17 +5,16 @@ from sktime.forecasting.exp_smoothing import ExponentialSmoothing
 from collections import namedtuple
 from sktime.forecasting.fbprophet import Prophet
 from sktime.forecasting.naive import NaiveForecaster
+from data import DataSet
 
 
-def get_model(
-    model_type: str, model_option_parsed: Tuple[str], data_train: pd.DataFrame
-):
+def get_model(model_type: str, model_option_parsed: Tuple[str]):
     if model_type == "ETS":
         model = ETSContainer(model_option_parsed, data_train)
     elif model_type == "ARIMA":
         model = ARIMAContainer(model_option_parsed, data_train)
     elif model_type == "Prophet":
-        model = ProphetContainer(model_option_parsed, data_train)
+        model = ProphetContainer(model_option_parsed)
     elif model_type == "Naive":
         model = NaiveContainer(data_train)
 
@@ -119,12 +118,9 @@ class ARIMAContainer:
 
 
 class ProphetContainer:
-    def __init__(self, model_options_raw: Tuple[str], data_train: pd.Series):
+    def __init__(self, model_options_raw: Tuple[str]):
         # self.hyperparams = self._parse_hyperparams(model_options_raw)
         self.model = self._init_model()
-        self.data_train = (
-            data_train.to_timestamp()
-        )  # TODO move this to the data as an option
         self.equation = self._get_equation()
 
     def _parse_hyperparams(self, model_options_raw: Tuple[str]) -> ARIMAHyperparams:
@@ -135,18 +131,18 @@ class ProphetContainer:
         return model
 
     @staticmethod
-    def _prep_data(data: pd.Series):
-        data_prep = data.copy()
-        try:
-            data_prep.index = data_prep.index.to_timestamp()
-        except AttributeError as e:
-            pass
+    def prep_data(dataset: DataSet):
+        data_prep = dataset.get_data_as_DateTimeIndex()
+        # try:
+        #     data_prep = data_prep.as_DateTimeIndex
+        # except AttributeError as e:
+        #     pass
         # data_prep = data_prep.reset_index().rename(columns={"index": "ds"})
         return data_prep
 
-    def fit(self) -> ARIMAResults:
-        data_prep = self._prep_data(self.data_train)
-        model_trained = self.model.fit(data_prep)
+    def fit(self, data_train) -> ARIMAResults:
+        # data_prep = self._prep_data(self.data_train)
+        model_trained = self.model.fit(data_train)
         return model_trained
 
     def _get_equation(self) -> str:

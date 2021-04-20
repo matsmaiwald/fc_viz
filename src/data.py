@@ -48,6 +48,7 @@ dataset_name_mapping = {
 class DataSet:
     data: pd.Series
     split_options: List[str]
+    freq: str
 
     @staticmethod
     def _get_train_test_split_options(data: pd.DataFrame):
@@ -57,21 +58,24 @@ class DataSet:
         split_options = data.index[split_options_ix]
         return split_options
 
-    def __init__(self, raw_name: str):
-        assert (
-            raw_name in dataset_name_mapping.keys()
-        ), f"Could not locate dataset: {raw_name}"
-        self.data = dataset_name_mapping[raw_name]
-
+    def __init__(self, data: pd.Series):
+        self.data = data
+        self.freq = data.index.freq.name
         split_options = self._get_train_test_split_options(self.data)
         self.split_options = list(map(lambda x: x.strftime("%Y-%m-%d"), split_options))
 
+    def get_data_as_DateTimeIndex(self):
+        return self.data.to_timestamp(freq=self.freq)
+
+
+def get_dataset(name):
+    assert name in dataset_name_mapping.keys(), f"Could not locate dataset: {name}"
+    data = dataset_name_mapping[name]
+    return DataSet(data)
+
 
 if __name__ == "__main__":
-    print(DataSet("australian_tourists").split_options)
-    print(DataSet("airline_passengers").split_options)
-    print(DataSet("australian_tourists").data)
+    data = skdata.load_shampoo_sales()
     import pdb
 
     pdb.set_trace()
-    print(DataSet("airline_passengers").data)
