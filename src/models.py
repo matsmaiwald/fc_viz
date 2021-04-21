@@ -27,28 +27,36 @@ ETSHyperparams = namedtuple(
 ARIMAHyperparams = namedtuple("ARIMAHyperparams", ["p", "d", "q"])
 
 
-class NaiveContainer:
-    def __init__(self):
-        self.model = NaiveForecaster()
-        self.equation = "TODO"
+class BaseModel:
+    @staticmethod
+    def prep_data(dataset):
+        return dataset.get_data()
 
     def fit(self, data_train):
         return self.model.fit(data_train)
 
-    @staticmethod
-    def prep_data(dataset):
-        return dataset.get_data()
+
+class NaiveContainer(BaseModel):
+    def __init__(self):
+        self.model = NaiveForecaster()
+        self.equation = "TODO"
+
+    # def fit(self, data_train):
+    #     return self.model.fit(data_train)
+
+    # @staticmethod
+    # def prep_data(dataset):
+    #     return dataset.get_data()
 
 
 class ETSContainer:
     hyperparams: ETSHyperparams
 
-    def __init__(self, model_options_raw: Tuple[str], data_train: pd.Series):
+    def __init__(self, model_options_raw: Tuple[str]):
 
         self.hyperparams = self._parse_hyperparams(model_options_raw)
         self.equation = self._get_equation()
         self.model = self._init_model()
-        self.data_train = data_train
 
     def _parse_hyperparams(self, model_options_raw: Tuple[str]) -> ETSHyperparams:
         trend_option = "mul" if "multiplicative trend" in model_options_raw else "add"
@@ -89,12 +97,12 @@ class ETSContainer:
         eqn = f"y_t = ({add_block}) {mult_block} {error_block}"
         return eqn
 
-    def fit(self):
-        return self.model.fit(self.data_train)
+    def fit(self, data_train):
+        return self.model.fit(data_train)
 
 
-class ARIMAContainer:
-    def __init__(self, model_options_raw: Tuple[str], data_train: pd.Series):
+class ARIMAContainer(BaseModel):
+    def __init__(self, model_options_raw: Tuple[str]):
         self.hyperparams = self._parse_hyperparams(model_options_raw)
         self.model = self._init_model(data_train)
         self.equation = self._get_equation()
@@ -113,14 +121,14 @@ class ARIMAContainer:
         )
         return model
 
-    def fit(self) -> ARIMAResults:
-        return self.model.fit()
+    # def fit(self) -> ARIMAResults:
+    #     return self.model.fit()
 
     def _get_equation(self) -> str:
         return "TODO: add equation"
 
 
-class ProphetContainer:
+class ProphetContainer(BaseModel):
     def __init__(self, model_options_raw: Tuple[str]):
         # self.hyperparams = self._parse_hyperparams(model_options_raw)
         self.model = self._init_model()
@@ -143,10 +151,10 @@ class ProphetContainer:
         # data_prep = data_prep.reset_index().rename(columns={"index": "ds"})
         return data_prep
 
-    def fit(self, data_train) -> ARIMAResults:
-        # data_prep = self._prep_data(self.data_train)
-        model_trained = self.model.fit(data_train)
-        return model_trained
+    # def fit(self, data_train) -> ARIMAResults:
+    #     # data_prep = self._prep_data(self.data_train)
+    #     model_trained = self.model.fit(data_train)
+    #     return model_trained
 
     def _get_equation(self) -> str:
         return "TODO: add equation"
