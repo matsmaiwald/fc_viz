@@ -67,6 +67,9 @@ class DataSet:
     def get_data_as_DateTimeIndex(self):
         return self.data.to_timestamp(freq=self.freq)
 
+    def get_data(self):
+        return self.data
+
 
 def get_dataset(name):
     assert name in dataset_name_mapping.keys(), f"Could not locate dataset: {name}"

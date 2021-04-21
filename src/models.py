@@ -10,13 +10,13 @@ from data import DataSet
 
 def get_model(model_type: str, model_option_parsed: Tuple[str]):
     if model_type == "ETS":
-        model = ETSContainer(model_option_parsed, data_train)
+        model = ETSContainer(model_option_parsed)
     elif model_type == "ARIMA":
-        model = ARIMAContainer(model_option_parsed, data_train)
+        model = ARIMAContainer(model_option_parsed)
     elif model_type == "Prophet":
         model = ProphetContainer(model_option_parsed)
     elif model_type == "Naive":
-        model = NaiveContainer(data_train)
+        model = NaiveContainer()
 
     return model
 
@@ -28,13 +28,16 @@ ARIMAHyperparams = namedtuple("ARIMAHyperparams", ["p", "d", "q"])
 
 
 class NaiveContainer:
-    def __init__(self, data_train: pd.Series):
+    def __init__(self):
         self.model = NaiveForecaster()
-        self.data_train = data_train
         self.equation = "TODO"
 
-    def fit(self):
-        return self.model.fit(self.data_train)
+    def fit(self, data_train):
+        return self.model.fit(data_train)
+
+    @staticmethod
+    def prep_data(dataset):
+        return dataset.get_data()
 
 
 class ETSContainer:
