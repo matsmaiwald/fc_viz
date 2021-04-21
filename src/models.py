@@ -1,11 +1,11 @@
 from typing import List, Tuple, Dict, Union
 import pandas as pd
-from statsmodels.tsa.arima.model import ARIMA, ARIMAResults
 from sktime.forecasting.exp_smoothing import ExponentialSmoothing
 from collections import namedtuple
 from sktime.forecasting.fbprophet import Prophet
 from sktime.forecasting.naive import NaiveForecaster
 from data import DataSet
+from sktime.forecasting.arima import ARIMA
 
 
 def get_model(model_type: str, model_option_parsed: Tuple[str]):
@@ -104,7 +104,7 @@ class ETSContainer:
 class ARIMAContainer(BaseModel):
     def __init__(self, model_options_raw: Tuple[str]):
         self.hyperparams = self._parse_hyperparams(model_options_raw)
-        self.model = self._init_model(data_train)
+        self.model = self._init_model()
         self.equation = self._get_equation()
 
     def _parse_hyperparams(self, model_options_raw: Tuple[str]) -> ARIMAHyperparams:
@@ -114,9 +114,8 @@ class ARIMAContainer(BaseModel):
             q=int(model_options_raw[2]),
         )
 
-    def _init_model(self, data_train) -> ARIMA:
+    def _init_model(self) -> ARIMA:
         model = ARIMA(
-            data_train,
             order=(self.hyperparams.p, self.hyperparams.d, self.hyperparams.q),
         )
         return model

@@ -2,3 +2,4 @@ statsmodels
 matplotlib
 sktime
 fbprophet
+pmdarima
