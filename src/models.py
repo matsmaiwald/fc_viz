@@ -49,7 +49,7 @@ class NaiveContainer(BaseModel):
     #     return dataset.get_data()
 
 
-class ETSContainer:
+class ETSContainer(BaseModel):
     hyperparams: ETSHyperparams
 
     def __init__(self, model_options_raw: Tuple[str]):
@@ -96,9 +96,6 @@ class ETSContainer:
             mult_block = "* s_{t-m}"
         eqn = f"y_t = ({add_block}) {mult_block} {error_block}"
         return eqn
-
-    def fit(self, data_train):
-        return self.model.fit(data_train)
 
 
 class ARIMAContainer(BaseModel):
