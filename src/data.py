@@ -4,19 +4,6 @@ from typing import List
 import sktime.datasets.base as skdata
 
 
-def get_australian_tourist_data():
-    data = pd.read_csv("/src/data_raw/australian_tourists.csv", index_col=False)
-
-    t = pd.date_range("1999-03-01", "2015-12-01", freq="3MS")
-    data = pd.Series(data.australian_tourists.values, index=t)
-    data.index = pd.PeriodIndex(data.index, freq="3M")
-
-    # data.index = pd.PeriodIndex(data.index, freq="3MS")
-    data.name = "actuals"
-    return data
-    # return data, data.index[-5:-2]
-
-
 def get_fred_data() -> pd.DataFrame:
     data = pd.read_csv("/src/data_raw/SP500.csv", na_values=".", parse_dates=True)
     data["DATE"] = pd.to_datetime(data["DATE"])
@@ -24,8 +11,10 @@ def get_fred_data() -> pd.DataFrame:
     data = data.reindex(
         pd.bdate_range(min(data.index), max(data.index)), fill_value=NaN
     )
+    data = data.interpolate()
+    data.index = pd.PeriodIndex(data.index, freq="B")
 
-    return data.interpolate()
+    return data
 
 
 def get_airline_data():
@@ -38,7 +27,6 @@ def get_lynx_population():
 
 dataset_name_mapping = {
     "S&P500": get_fred_data(),
-    "australian_tourists": get_australian_tourist_data(),
     "airline_passengers": get_airline_data(),
     "shampoo_sales": skdata.load_shampoo_sales(),
     "lynx_population": get_lynx_population(),
@@ -78,7 +66,7 @@ def get_dataset(name):
 
 
 if __name__ == "__main__":
-    data = skdata.load_shampoo_sales()
+    data = get_fred_data()
     import pdb
 
     pdb.set_trace()
