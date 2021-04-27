@@ -13,13 +13,13 @@ WORKDIR  /usr/src/fc_viz
 
 # Installing python dependencies
 COPY requirements_general.txt .
-RUN --mount=type=cache,mode=0755,target=/root/.cache/pip pip install --no-cache-dir -r requirements_general.txt
+RUN pip install -r requirements_general.txt
 
 COPY requirements_prophet.txt .
-RUN --mount=type=cache,mode=0755,target=/root/.cache/pip pip install --no-cache-dir -r requirements_prophet.txt
+RUN pip install -r requirements_prophet.txt
 # RUN pip install holidays tqdm
 COPY requirements.txt .
-RUN --mount=type=cache,mode=0755,target=/root/.cache/pip pip install --no-cache-dir -r requirements.txt
+RUN pip install -r requirements.txt
 
 # Copy all the files from the project’s root to the working directory
 # COPY src/ /src/
