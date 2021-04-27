@@ -1,5 +1,5 @@
 statsmodels
 matplotlib
 sktime
-fbprophet
+# fbprophet
 pmdarima

@@ -17,7 +17,7 @@ test_start = st.sidebar.selectbox("train_test_cutoff", dataset.split_options)
 
 model_options = (
     "Naive",
-    "Prophet",
+    # "Prophet",
     "ARIMA(p=1, d=0, q=0)",
     "ARIMA(p=0, d=1, q=0) -- random walk",
     "ARIMA(p=0, d=1, q=1) -- simple exponential smoothing with growth",
