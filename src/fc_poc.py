@@ -28,10 +28,14 @@ model_options = (
     "ARIMA(p=10, d=1, q=1)",
     "AutoArima",
     "TBATS",
+    "TBATS, 5 seasons",
+    "TBATS, 12 seasons",
     "ETS: additive trend, additive seasonality, 4 seasons",
     "ETS: additive trend, additive seasonality, 5 seasons",
+    "ETS: additive trend, additive seasonality, 12 seasons",
     "ETS: additive trend, multiplicative seasonality, 4 seasons",
     "ETS: additive trend, multiplicative seasonality, 5 seasons",
+    "ETS: additive trend, multiplicative seasonality, 12 seasons",
 )
 model_option_input = st.selectbox("Model option", model_options)
 
