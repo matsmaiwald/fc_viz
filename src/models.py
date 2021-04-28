@@ -2,10 +2,12 @@ from typing import List, Tuple, Dict, Union
 import pandas as pd
 from sktime.forecasting.exp_smoothing import ExponentialSmoothing
 from collections import namedtuple
-from sktime.forecasting.fbprophet import Prophet
+
+# from sktime.forecasting.fbprophet import Prophet
 from sktime.forecasting.naive import NaiveForecaster
 from data import DataSet
 from sktime.forecasting.arima import ARIMA, AutoARIMA
+from sktime.forecasting.tbats import TBATS
 
 
 def get_model(model_type: str, model_option_parsed: Tuple[str]):
@@ -13,12 +15,14 @@ def get_model(model_type: str, model_option_parsed: Tuple[str]):
         model = ETSContainer(model_option_parsed)
     elif model_type == "ARIMA":
         model = ARIMAContainer(model_option_parsed)
-    elif model_type == "Prophet":
-        model = ProphetContainer(model_option_parsed)
+    # elif model_type == "Prophet":
+    #     model = ProphetContainer(model_option_parsed)
     elif model_type == "Naive":
         model = NaiveContainer()
     elif model_type == "AutoArima":
         model = AutoArimaContainer()
+    elif model_type == "TBATS":
+        model = TBATSContainer()
 
     return model
 
@@ -108,8 +112,14 @@ class ETSContainer(BaseModel):
 
 
 class AutoArimaContainer(BaseModel):
-    def _init_model(self) -> ExponentialSmoothing:
+    def _init_model(self) -> AutoARIMA:
         model = AutoARIMA(seasonal=True)
+        return model
+
+
+class TBATSContainer(BaseModel):
+    def _init_model(self) -> TBATS:
+        model = TBATS()
         return model
 
 
@@ -139,31 +149,31 @@ class ARIMAContainer(BaseModel):
         return "TODO: add equation"
 
 
-class ProphetContainer(BaseModel):
-    def __init__(self, model_options_raw: Tuple[str]):
-        # self.hyperparams = self._parse_hyperparams(model_options_raw)
-        self.model = self._init_model()
-        self.equation = self._get_equation()
+# class ProphetContainer(BaseModel):
+#     def __init__(self, model_options_raw: Tuple[str]):
+#         # self.hyperparams = self._parse_hyperparams(model_options_raw)
+#         self.model = self._init_model()
+#         self.equation = self._get_equation()
 
-    def _parse_hyperparams(self, model_options_raw: Tuple[str]) -> ARIMAHyperparams:
-        pass
+#     def _parse_hyperparams(self, model_options_raw: Tuple[str]) -> ARIMAHyperparams:
+#         pass
 
-    def _init_model(self) -> Prophet:
-        model = Prophet()
-        return model
+#     def _init_model(self) -> Prophet:
+#         model = Prophet()
+#         return model
 
-    @staticmethod
-    def prep_data(dataset: DataSet):
-        data_prep = dataset.get_data_as_DateTimeIndex()
-        # try:
-        #     data_prep = data_prep.as_DateTimeIndex
-        # except AttributeError as e:
-        #     pass
-        # data_prep = data_prep.reset_index().rename(columns={"index": "ds"})
-        return data_prep
+#     @staticmethod
+#     def prep_data(dataset: DataSet):
+#         data_prep = dataset.get_data_as_DateTimeIndex()
+#         # try:
+#         #     data_prep = data_prep.as_DateTimeIndex
+#         # except AttributeError as e:
+#         #     pass
+#         # data_prep = data_prep.reset_index().rename(columns={"index": "ds"})
+#         return data_prep
 
-    # def fit(self, data_train) -> ARIMAResults:
-    #     # data_prep = self._prep_data(self.data_train)
-    #     model_trained = self.model.fit(data_train)
-    #     return model_trained
+# def fit(self, data_train) -> ARIMAResults:
+#     # data_prep = self._prep_data(self.data_train)
+#     model_trained = self.model.fit(data_train)
+#     return model_trained
 
