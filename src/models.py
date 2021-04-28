@@ -5,7 +5,7 @@ from collections import namedtuple
 from sktime.forecasting.fbprophet import Prophet
 from sktime.forecasting.naive import NaiveForecaster
 from data import DataSet
-from sktime.forecasting.arima import ARIMA
+from sktime.forecasting.arima import ARIMA, AutoARIMA
 
 
 def get_model(model_type: str, model_option_parsed: Tuple[str]):
@@ -17,6 +17,8 @@ def get_model(model_type: str, model_option_parsed: Tuple[str]):
         model = ProphetContainer(model_option_parsed)
     elif model_type == "Naive":
         model = NaiveContainer()
+    elif model_type == "AutoArima":
+        model = AutoArimaContainer()
 
     return model
 
@@ -28,6 +30,10 @@ ARIMAHyperparams = namedtuple("ARIMAHyperparams", ["p", "d", "q"])
 
 
 class BaseModel:
+    def __init__(self):
+        self.model = self._init_model()
+        self.equation = self._get_equation()
+
     @staticmethod
     def prep_data(dataset):
         return dataset.get_data()
@@ -35,11 +41,14 @@ class BaseModel:
     def fit(self, data_train):
         return self.model.fit(data_train)
 
+    def _get_equation(self) -> str:
+        return "TODO: add equation"
+
 
 class NaiveContainer(BaseModel):
-    def __init__(self):
-        self.model = NaiveForecaster()
-        self.equation = "TODO"
+    def _init_model(self) -> NaiveForecaster:
+        model = NaiveForecaster()
+        return model
 
     # def fit(self, data_train):
     #     return self.model.fit(data_train)
@@ -98,6 +107,12 @@ class ETSContainer(BaseModel):
         return eqn
 
 
+class AutoArimaContainer(BaseModel):
+    def _init_model(self) -> ExponentialSmoothing:
+        model = AutoARIMA(seasonal=True)
+        return model
+
+
 class ARIMAContainer(BaseModel):
     def __init__(self, model_options_raw: Tuple[str]):
         self.hyperparams = self._parse_hyperparams(model_options_raw)
@@ -152,5 +167,3 @@ class ProphetContainer(BaseModel):
     #     model_trained = self.model.fit(data_train)
     #     return model_trained
 
-    def _get_equation(self) -> str:
-        return "TODO: add equation"

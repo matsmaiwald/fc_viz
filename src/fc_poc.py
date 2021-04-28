@@ -26,6 +26,7 @@ model_options = (
     "ARIMA(p=10, d=1, q=0)",
     "ARIMA(p=1, d=1, q=1)",
     "ARIMA(p=10, d=1, q=1)",
+    "AutoArima",
     "ETS: additive trend, additive seasonality, 4 seasons",
     "ETS: additive trend, additive seasonality, 5 seasons",
     "ETS: additive trend, multiplicative seasonality, 4 seasons",
@@ -53,6 +54,9 @@ def parse_model_options_box(model_option_input: str):
     if model_option_input.startswith("Naive"):
         groups = "empty"
         model_type = "Naive"
+    if model_option_input.startswith("AutoArima"):
+        groups = "empty"
+        model_type = "AutoArima"
 
     return model_type, groups
 
