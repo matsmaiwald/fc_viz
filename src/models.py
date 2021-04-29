@@ -22,7 +22,7 @@ def get_model(model_type: str, model_option_parsed: Tuple[str]):
     elif model_type == "AutoArima":
         model = AutoArimaContainer()
     elif model_type == "TBATS":
-        model = TBATSContainer()
+        model = TBATSContainer(model_option_parsed)
 
     return model
 
@@ -118,8 +118,14 @@ class AutoArimaContainer(BaseModel):
 
 
 class TBATSContainer(BaseModel):
+    def __init__(self, seasonality_periods: List[float]):
+        self.hyperparams = {"sp": [seasonality_periods]}
+        self.model = self._init_model()
+        self.equation = self._get_equation()
+
     def _init_model(self) -> TBATS:
-        model = TBATS()
+        print(self.hyperparams["sp"])
+        model = TBATS(sp=self.hyperparams["sp"])
         return model
 
 

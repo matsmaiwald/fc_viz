@@ -27,7 +27,6 @@ model_options = (
     "ARIMA(p=1, d=1, q=1)",
     "ARIMA(p=10, d=1, q=1)",
     "AutoArima",
-    "TBATS",
     "TBATS, 5 seasons",
     "TBATS, 12 seasons",
     "ETS: additive trend, additive seasonality, 4 seasons",
@@ -64,7 +63,7 @@ def parse_model_options_box(model_option_input: str):
         model_type = "AutoArima"
 
     if model_option_input.startswith("TBATS"):
-        groups = "empty"
+        groups = re.findall(r"TBATS, ([0-9]+) seasons", model_option_input)[0]
         model_type = "TBATS"
     return model_type, groups
 
