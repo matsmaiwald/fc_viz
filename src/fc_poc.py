@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import re
 from models import get_model
 
-from sklearn.metrics import mean_squared_error
+from sklearn.metrics import mean_squared_error, mean_absolute_error
 from data import dataset_name_mapping, get_dataset
 
 # SET UP INPUT
@@ -84,7 +84,8 @@ try:
     mse_in_sample = mean_squared_error(data_train, fit.fittedvalues)
 except AttributeError:
     pass
-mse_out_of_sample = mean_squared_error(data_test, pred)
+mse_out_of_sample = (mean_squared_error(data_test, pred)) ** 0.5
+mae_out_of_sample = mean_absolute_error(data_test, pred)
 
 
 # CREATE PLOT
@@ -120,6 +121,7 @@ try:
 except NameError:
     pass
 st.text(f"Out-of-sample RMSE: {round(mse_out_of_sample, 2)}")
+st.text(f"Out-of-sample MAE: {round(mae_out_of_sample, 2)}")
 
 
 st.pyplot(fig)
